@@ -67,7 +67,7 @@ def SheetFabDiscoveredNodes(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
                 if propertie['key'] == 'licenseProductVersion': Dict_Properties[propertie['key']] = propertie['value']
                 if propertie['key'] == 'managementServerIp': Dict_Properties[propertie['key']] = propertie['value']
                 if propertie['key'] == 'lockdownMode': Dict_Properties[propertie['key']] = propertie['value']
-                if propertie['key'] == 'dasHostState': Dict_Properties[propertie['key']] = propertie['value']
+            #    if propertie['key'] == 'dasHostState': Dict_Properties[propertie['key']] = propertie['value'] -> Removed for 2.5 Support
                             
             # Fill Discovered Nodes Dict
             Dict_DiscoveredNodes['node_name'] = node['display_name']
@@ -94,11 +94,12 @@ def SheetFabDiscoveredNodes(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
             Dict_DiscoveredNodes['licenseProductVersion'] = Dict_Properties['licenseProductVersion']
             Dict_DiscoveredNodes['managementServerIp'] = Dict_Properties['managementServerIp']
             Dict_DiscoveredNodes['lockdownMode'] = Dict_Properties['lockdownMode']
-            Dict_DiscoveredNodes['dasHostState'] = Dict_Properties['dasHostState']
+            # Dict_DiscoveredNodes['dasHostState'] = Dict_Properties['dasHostState'] -> Removed for 2.5 Support
             NSX_Config['DiscoveredNodes'].append(Dict_DiscoveredNodes)
 
             # write one line for a node
-            XLS_Lines.append([node['display_name'],node['os_type'], node['os_version'], node['node_type'], Dict_Properties['hostName'], Dict_Properties['fullName'], Dict_Properties['managementIp'], Dict_Properties['domainName'], Dict_Properties['dnsConfigAddress'], Dict_Properties['uuid'], Dict_Properties['powerState'], Dict_Properties['inMaintenanceMode'], Dict_Properties['build'], Dict_Properties['vendor'], Dict_Properties['model'], Dict_Properties['serialNumber'], Dict_Properties['connectionState'], Dict_Properties['licenseProductName'], Dict_Properties['licenseProductVersion'], Dict_Properties['managementServerIp'], Dict_Properties['lockdownMode'], Dict_Properties['dasHostState']])
+            # removed dasHostState from XLS Line -> 2.5 support
+            XLS_Lines.append([node['display_name'],node['os_type'], node['os_version'], node['node_type'], Dict_Properties['hostName'], Dict_Properties['fullName'], Dict_Properties['managementIp'], Dict_Properties['domainName'], Dict_Properties['dnsConfigAddress'], Dict_Properties['uuid'], Dict_Properties['powerState'], Dict_Properties['inMaintenanceMode'], Dict_Properties['build'], Dict_Properties['vendor'], Dict_Properties['model'], Dict_Properties['serialNumber'], Dict_Properties['connectionState'], Dict_Properties['licenseProductName'], Dict_Properties['licenseProductVersion'], Dict_Properties['managementServerIp'], Dict_Properties['lockdownMode']])
     else:
         XLS_Lines.append(['No result', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
     if GetOutputFormat() == 'CSV':

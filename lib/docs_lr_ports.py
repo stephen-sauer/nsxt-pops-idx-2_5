@@ -35,76 +35,86 @@ from lib.system import style, GetAPI, ConnectNSX, os, GetOutputFormat
 
 def SheetRouterPorts(auth_list,WORKBOOK,TN_WS,NSX_Config = {}):
     if 'LRPorts' not in NSX_Config:
-        NSX_Config['LRPorts'] = []
+        NSX_Config['LRports'] = []
     Dict_Ports = {}
+    NSX_LRPorts = []
 
     SessionNSX = ConnectNSX(auth_list)
-    ########### GET LogicalPortDownLink  ###########
-    LRports_Down_url = '/api/v1/search/query?query=resource_type:LogicalRouterDownLinkPort'
-    LRports_Down_json = GetAPI(SessionNSX[0],LRports_Down_url, auth_list)
+    ############ GET LogicalPortDownLink  ###########
+    #LRports_Down_url = '/api/v1/search/query?query=resource_type:LogicalRouterDownLinkPort'
+    #LRports_Down_json = GetAPI(SessionNSX[0],LRports_Down_url, auth_list)
     ########### GET Logical Routers  ###########
-    lr_ports_url = '/api/v1/search/query?query=resource_type:LogicalPort'
+    lr_ports_url = '/api/v1/logical-router-ports'
     lr_ports_json = GetAPI(SessionNSX[0],lr_ports_url, auth_list)
     ########### GET Logical Routers  ###########
     lr_list_url = '/api/v1/logical-routers'
     lr_list_json = GetAPI(SessionNSX[0],lr_list_url, auth_list)
     ########### CREATE LIST OF TUPLES - EDGE-ID / EDGE NAME ###########
-    lswitch_list = []
+    #lswitch_list = []
     XLS_Lines = []
-    TN_HEADER_ROW = ('LR Port Name', 'ID', 'Attachment Type', 'Logical Router Name', 'Attachment ID', 'Logical Switch ID', 'Logical Switch','Create User', 'Admin State', 'Status')
+    TN_HEADER_ROW = ('LR Port Name', 'ID', 'Create User', 'Resource Type')
     ########### GET Logical-Switches  ###########
-    lswitch_url = '/api/v1/logical-switches'
-    lswitch_json = GetAPI(SessionNSX[0],lswitch_url, auth_list)
+    #lswitch_url = '/api/v1/logical-switches'
+    #lswitch_json = GetAPI(SessionNSX[0],lswitch_url, auth_list)
 
-    for i in lswitch_json["results"]:
-        lswitch_list.append(tuple((i['id'],i['display_name'])))
+    #for i in lswitch_json["results"]:
+    #    lswitch_list.append(tuple((i['id'],i['display_name'])))
 
     if lr_ports_json['result_count'] > 0:
-        for port in lr_ports_json["results"]:
-            # Check is attachment key is in Dict
-            if 'attachment' in port: 
-                Attachement_type = port['attachment']['attachment_type']
-                Attachement_ID= port['attachment']['id']
-            else:
-                Attachement_type = 'No Attachment'
-                Attachement_ID = 'No Attachment'
+        for LRPorts in lr_ports_json['results']:
+            ## Check is attachment key is in Dict
+            #if 'attachment' in port: 
+            #    Attachement_type = port['attachment']['attachment_type']
+            #    Attachement_ID= port['attachment']['id']
+            #else:
+            #    Attachement_type = 'No Attachment'
+            #    Attachement_ID = 'No Attachment'
+            
             # Get the name of LS
-            LS_Name = ""
-            LR_Name = ""
-            for ls in lswitch_list:
-                if port['logical_switch_id'] == ls[0]:
-                    LS_Name = ls[1]
-                    # Get Router Name
-                    for lr in LRports_Down_json['results']:
-                        if 'linked_logical_switch_port_id' in lr:
-                            if port['id'] == lr['linked_logical_switch_port_id']['target_id']:
-                                for router in lr_list_json['results']:
-                                    if lr['logical_router_id'] == router['id']: LR_Name = router['display_name']
+            #LS_Name = ""
+            #LR_Name = ""
+            #for ls in lswitch_list:
+            #    if port['logical_switch_id'] == ls[0]:
+            #        LS_Name = ls[1]
+            #        # Get Router Name
+            #        for lr in lr_ports_json['results']:
+            #            if 'linked_logical_switch_port_id' in lr:
+            #                if port['id'] == lr['linked_logical_switch_port_id']['target_id']:
+            #                    for router in lr_list_json['results']:
+            #                        if lr['logical_router_id'] == router['id']: LR_Name = router['display_name']
 
-            Dict_Ports['name'] = port['display_name']
-            Dict_Ports['state'] =  port['admin_state']
-            Dict_Ports['create_user'] = port['_create_user']
-            Dict_Ports['router'] = LR_Name
-            Dict_Ports['id'] = port['id']
-            Dict_Ports['att_type'] = Attachement_type
-            Dict_Ports['att_id'] = Attachement_ID
-            Dict_Ports['LS_id'] = port['logical_switch_id']
-            Dict_Ports['LS_name'] = LS_Name
-            Dict_Ports['status'] = port['status']['status']
-            NSX_Config['LRPorts'].append(Dict_Ports)
-            XLS_Lines.append([port['display_name'], port['id'],Attachement_type,LR_Name, Attachement_ID, port['logical_switch_id'],LS_Name,port['_create_user'],port['admin_state'], port['status']['status']])
+            Dict_Ports['name'] = LRPorts['display_name']
+            #print("The value of port.display_name is: ", ['display_name'])
+            #print("The value of Dict_Ports.name is: ", Dict_Ports['name'])
+            #Dict_Ports['state'] =  port['admin_state']
+            Dict_Ports['create_user'] = LRPorts['_create_user']
+            #Dict_Ports['router'] = LR_Name
+            Dict_Ports['id'] = LRPorts['id']
+            #resource-type added to dict for 2.5
+            Dict_Ports['resource_type'] = LRPorts['resource_type']
+            #Dict_Ports['att_type'] = Attachement_type
+            #Dict_Ports['att_id'] = Attachement_ID
+            #Dict_Ports['LS_id'] = port['logical_switch_id']
+            #Dict_Ports['LS_name'] = LS_Name
+            #Dict_Ports['status'] = port['status']['status']
+            
+            NSX_LRPorts.append([LRPorts['display_name'], LRPorts['id'],LRPorts['_create_user'],LRPorts['resource_type']])
+            #XLS_Lines.append([port['display_name'], port['id'],Attachement_type,LR_Name, Attachement_ID, port['logical_switch_id'],LS_Name,port['_create_user'],port['admin_state'], port['status']['status']])
+            XLS_Lines.append([LRPorts['display_name'], LRPorts['id'],LRPorts['_create_user'],LRPorts['resource_type']])
+            #print(Dict_Ports)
+            #print(NSX_LRPorts)
     else:
-        XLS_Lines.append(['No results', "", "", "", "", "", "", "", ""])
+        XLS_Lines.append(['No results', "", "", "", ""])
         
     if GetOutputFormat() == 'CSV':
         CSV = WORKBOOK
         FillSheetCSV(CSV,TN_HEADER_ROW,XLS_Lines)
     elif GetOutputFormat() == 'JSON':
         JSON = WORKBOOK
-        FillSheetJSON(JSON, NSX_Config)
+        FillSheetJSON(JSON, NSX_LRPorts)
     elif GetOutputFormat() == 'YAML':
         YAML = WORKBOOK
-        FillSheetYAML(YAML, NSX_Config)
+        FillSheetYAML(YAML, NSX_LRPorts)
     else:
         FillSheet(WORKBOOK,TN_WS.title,TN_HEADER_ROW,XLS_Lines,"0072BA")
         if len(XLS_Lines) > 0:

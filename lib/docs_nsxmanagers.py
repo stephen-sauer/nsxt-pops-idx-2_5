@@ -57,11 +57,12 @@ def SheetNSXManagerInfo(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
     NSX_Config['NSXManager']['Cluster_id'] = nsxclstr_json['cluster_id']
     NSX_Config['NSXManager']['Cluster_status'] = nsxclstr_json['mgmt_cluster_status']['status']
     NSX_Config['NSXManager']['Cluster_ctrl_status'] = nsxclstr_json['control_cluster_status']['status']
-    NSX_Config['NSXManager']['Cluster_overall_status'] = nsxclstr_json['detailed_cluster_status']['overall_status']
+    # NSX_Config['NSXManager']['Cluster_overall_status'] = nsxclstr_json['detailed_cluster_status']['overall_status'] -> Removed for 2.5 Support
     NSX_Config['NSXManager']['Cluster_online_nodes'] = online_nodes
     NSX_Config['NSXManager']['Cluster_offline_nodes'] = offline_nodes
     # Summary Table
-    XLS_Lines = [['NSX-T Cluster ID', nsxclstr_json['cluster_id']], ['NSX-T version', nsx_version], ['NSX-T Cluster Status', nsxclstr_json['mgmt_cluster_status']['status']], ['NSX-T Control Cluster Status', nsxclstr_json['control_cluster_status']['status']] , ['Overall NSX-T Cluster Status', nsxclstr_json['detailed_cluster_status']['overall_status']], ['Number of online nodes', online_nodes], ['Number of offline nodes', offline_nodes]]
+    XLS_Lines = [['NSX-T Cluster ID', nsxclstr_json['cluster_id']], ['NSX-T version', nsx_version], ['NSX-T Cluster Status', nsxclstr_json['mgmt_cluster_status']['status']], ['NSX-T Control Cluster Status', nsxclstr_json['control_cluster_status']['status']] , ['Overall NSX-T Cluster Status', "No_Info"], ['Number of online nodes', online_nodes], ['Number of offline nodes', offline_nodes]]
+    #XLS_Lines = [['NSX-T Cluster ID', nsxclstr_json['cluster_id']], ['NSX-T version', nsx_version], ['NSX-T Cluster Status', nsxclstr_json['mgmt_cluster_status']['status']], ['NSX-T Control Cluster Status', nsxclstr_json['control_cluster_status']['status']] , ['Overall NSX-T Cluster Status', nsxclstr_json['detailed_cluster_status']['overall_status']], ['Number of online nodes', online_nodes], ['Number of offline nodes', offline_nodes]]
     idx_second_sheet = len(XLS_Lines) + 2
     # Write in Excel
     for line in XLS_Lines:
@@ -76,19 +77,20 @@ def SheetNSXManagerInfo(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
     ConditionnalFormat(TN_WS, 'B6:B6', '3')
     ConditionnalFormat(TN_WS, 'B7:B7', '0')
 
-    # Create second sheet
-    TN_WS[idx_second_sheet]
-    XLS_Lines = []
-    TN_HEADER_ROW = ('Group ID', 'Group Type', 'Group Status','Member FQDN', 'Member IP address', 'Member UUID', 'Member Status')
-    for group in nsxclstr_json['detailed_cluster_status']['groups']:
-        for member in group['members']:
-            XLS_Lines.append([group['group_id'],group['group_type'], group['group_status'], member['member_fqdn'], member['member_ip'], member['member_uuid'], member['member_status']])
-
-    startCell = "A" + str(idx_second_sheet + 1)
+    # Remove 2nd sheet creation using detailed_cluster_status infos not there in 2.5 
+    ## Create second sheet
+    # TN_WS[idx_second_sheet]
+    # XLS_Lines = []
+    # TN_HEADER_ROW = ('Group ID', 'Group Type', 'Group Status','Member FQDN', 'Member IP address', 'Member UUID', 'Member Status')
+    # for group in nsxclstr_json['detailed_cluster_status']['groups']:
+    #     for member in group['members']:
+    #         XLS_Lines.append([group['group_id'],group['group_type'], group['group_status'], member['member_fqdn'], member['member_ip'], member['member_uuid'], member['member_status']])
+    
+    # startCell = "A" + str(idx_second_sheet + 1)
 
     if GetOutputFormat() == 'CSV':
         CSV = WORKBOOK
-        FillSheetCSV(CSV,TN_HEADER_ROW,XLS_Lines)
+        FillSheetCSV(CSV,TN_WS.title,XLS_Lines)
     elif GetOutputFormat() == 'JSON':
         JSON = WORKBOOK
         FillSheetJSON(JSON, NSX_Config)
