@@ -1,6 +1,7 @@
 Copyright © 2020 VMware, Inc. All Rights Reserved.
 SPDX-License-Identifier: MIT
 # NSX Power Operations - An NSX-T Operationalisation Project
+CLI Version to support some 2.5 API Calls
 
 ![logo](logo.png)
 
