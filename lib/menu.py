@@ -42,7 +42,7 @@ from lib.docs_logical_switches import SheetSegments
 from lib.docs_tier0_routingtables import SheetT0RoutingTable
 from lib.docs_tier1_forwardingtables import SheetT1ForwardingTable
 from lib.docs_nsxmanagers import SheetNSXManagerInfo
-from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
+from lib.docs_tn import SheetFabTransportNodes
 from lib.docs_transportzones import SheetTZ
 from lib.docs_services import SheetNSXServices
 from lib.docs_tn_tunnels import SheetTunnels
@@ -70,7 +70,7 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
     global XLS_Dest
     XLS_Dest = dest
     FabManager = Menu("","NSX-T Manager Info", None, SheetNSXManagerInfo, "NSX_Managers_Info")
-    FabNodes = Menu("","Fabric Discovered Nodes", None, SheetFabDiscoveredNodes, "Fabric_Discovered_Nodes")
+    FabNodes = Menu("","Fabric Transport Nodes", None, SheetFabTransportNodes, "Fabric_Transport_Nodes")
     FabTZ = Menu("","Transport Zones", None, SheetTZ, "Transport_Zones")
     FabServices = Menu("","NSX-T Services", None, SheetNSXServices, "Services")
     FabTunnles = Menu("","Transport Node Tunnels", None, SheetTunnels,"Transport_Node_Tunnels")
