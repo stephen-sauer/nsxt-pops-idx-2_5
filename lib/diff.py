@@ -45,7 +45,8 @@ from lib.docs_RoutingSessions import SheetBGPSession
 from lib.docs_tier0_routingtables import SheetT0RoutingTable
 from lib.docs_tier1_forwardingtables import SheetT1ForwardingTable
 from lib.docs_nsxmanagers import SheetNSXManagerInfo
-from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
+from lib.docs_tn import SheetFabTransportNodes
+# from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
 from lib.docs_transportzones import SheetTZ
 from lib.docs_services import SheetNSXServices
 from lib.docs_tn_tunnels import SheetTunnels
@@ -90,11 +91,11 @@ def SetXLSDiffFile(auth_list, xls_diff_bkp_filename):
             print('Generating NSX-T Manager Information sheet')
             TN_WS = WORKBOOK[0].create_sheet("NSX_Manager_Info")
             SheetNSXManagerInfo(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
-        # Generating NSX-T Fabric Discovered Nodes sheet
+        # Generating NSX-T Fabric Transport Nodes sheet
         if 'Transport_Nodes' in DIFF_WORKBOOK.sheetnames:
-            print('Generating NSX-T Fabric Discovered Nodes sheet')
+            print('Generating NSX-T Fabric Transport Nodes sheet')
             TN_WS = WORKBOOK[0].create_sheet("Transport_Nodes")
-            SheetFabDiscoveredNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
+            SheetFabTransportNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
             CheckXLSTabDiff(TN_WS, DIFF_WORKBOOK['Transport_Nodes'])
         # Generating NSX-T Transport Zones sheet
         if 'Transport_Zones' in DIFF_WORKBOOK.sheetnames:

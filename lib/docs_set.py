@@ -42,7 +42,8 @@ from lib.docs_RoutingSessions import SheetBGPSession
 from lib.docs_tier0_routingtables import SheetT0RoutingTable
 from lib.docs_tier1_forwardingtables import SheetT1ForwardingTable
 from lib.docs_nsxmanagers import SheetNSXManagerInfo
-from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
+from lib.docs_tn import SheetFabTransportNodes
+# from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
 from lib.docs_transportzones import SheetTZ
 from lib.docs_services import SheetNSXServices
 from lib.docs_tn_tunnels import SheetTunnels
@@ -66,8 +67,11 @@ def DocsSetOne(auth_list):
             SheetSummary(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
             print('\nGenerating NSX-T Manager Information sheet')
             SheetNSXManagerInfo(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
-            print('Generating NSX-T Fabric Discovered Nodes sheet')
-            SheetFabDiscoveredNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
+            
+            print('Generating NSX-T Fabric Transport Nodes sheet')
+            SheetFabTransportNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
+            # print('Generating NSX-T Fabric Discovered Nodes sheet')
+            # SheetFabDiscoveredNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
             print('Generating NSX-T Transport Zones sheet')
             SheetTZ(auth_list,WORKBOOK[0],TN_WS, NSX_Config)
             print('Generating NSX-T Services sheet')
@@ -106,9 +110,9 @@ def DocsSetOne(auth_list):
             print('\nGenerating NSX-T Manager Information sheet')
             TN_WS = WORKBOOK[0].create_sheet("NSX_Manager_Info")
             SheetNSXManagerInfo(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
-            print('Generating NSX-T Fabric Discovered Nodes sheet')
+            print('Generating NSX-T Fabric Transport Nodes sheet')
             TN_WS = WORKBOOK[0].create_sheet("Transport_Nodes")
-            SheetFabDiscoveredNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
+            SheetFabTransportNodes(auth_list,WORKBOOK[0],TN_WS,NSX_Config)
             print('Generating NSX-T Transport Zones sheet')
             TN_WS = WORKBOOK[0].create_sheet("Transport_Zones")
             SheetTZ(auth_list,WORKBOOK[0],TN_WS, NSX_Config)
@@ -157,7 +161,7 @@ def DocsSetOne(auth_list):
 def DocsSetMultiple(auth_list):
     start_time = time.time()
     CreateXLSFile(auth_list,"NSX_Managers_Info",SheetNSXManagerInfo)
-    CreateXLSFile(auth_list,"Fabric_Discovered_Nodes",SheetFabDiscoveredNodes)
+    CreateXLSFile(auth_list,"Fabric_Transport_Nodes",SheetFabTransportNodes)
     CreateXLSFile(auth_list,"Transport_Node_Tunnels",SheetTunnels)
     CreateXLSFile(auth_list,"Transport_Zones",SheetTZ)
     CreateXLSFile(auth_list,"Services",SheetNSXServices)
