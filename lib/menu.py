@@ -28,11 +28,12 @@
 #                                                                                                                                                                                           #
 #############################################################################################################################################################################################
 from lib.health import GetBGPSessions, GetHealthNSXCluster, GetNSXSummary, GetTNTunnels, GetTNStatus, GetComputeDetail,\
-    GetEdgeCLDetail, GetEdgeStatus, GetLRSum, GetNetworkUsage, GetSecurityUsage, GetInventoryUsage, GetDFWRulesVNIC
+    GetEdgeCLDetail, GetEdgeStatus, GetLRSum, GetNetworkUsage, GetSecurityUsage, GetInventoryUsage, GetDFWRulesVNIC, GetDFWRulesStats
 from lib.docs_alarms import SheetAlarms
 from lib.docs_groups import SheetSecGrp
 from lib.docs_securitypolicies import SheetSecPol
 from lib.docs_securitypolicies_and_rules import SheetSecDFW
+from lib.docs_securityrules_mgrsect import SheetSecRulesSec
 from lib.docs_tier1_segments import SheetT1Segments
 from lib.docs_RoutingSessions import SheetBGPSession
 from lib.docs_lr_summary import SheetRouterSum
@@ -42,7 +43,7 @@ from lib.docs_logical_switches import SheetSegments
 from lib.docs_tier0_routingtables import SheetT0RoutingTable
 from lib.docs_tier1_forwardingtables import SheetT1ForwardingTable
 from lib.docs_nsxmanagers import SheetNSXManagerInfo
-from lib.docs_tn import SheetFabTransportNodes
+from lib.docs_discovered_nodes import SheetFabDiscoveredNodes
 from lib.docs_transportzones import SheetTZ
 from lib.docs_services import SheetNSXServices
 from lib.docs_tn_tunnels import SheetTunnels
@@ -51,6 +52,7 @@ from lib.system import style, CopyFile
 from lib.excel import CreateXLSFile
 from lib.diff import IfDiff, GetDiffFileName, SetXLSDiffFile
 import os
+import traceback
 
 # Definition of one menu
 class Menu:
@@ -70,7 +72,7 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
     global XLS_Dest
     XLS_Dest = dest
     FabManager = Menu("","NSX-T Manager Info", None, SheetNSXManagerInfo, "NSX_Managers_Info")
-    FabNodes = Menu("","Fabric Transport Nodes", None, SheetFabTransportNodes, "Fabric_Transport_Nodes")
+    FabNodes = Menu("","Fabric Discovered Nodes", None, SheetFabDiscoveredNodes, "Fabric_Discovered_Nodes")
     FabTZ = Menu("","Transport Zones", None, SheetTZ, "Transport_Zones")
     FabServices = Menu("","NSX-T Services", None, SheetNSXServices, "Services")
     FabTunnles = Menu("","Transport Node Tunnels", None, SheetTunnels,"Transport_Node_Tunnels")
@@ -86,8 +88,9 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
     VNSPrev = Menu("", "Return to previous menu", None, 'Back')
 
     SecGrp = Menu("","Export Security Group Info", None, SheetSecGrp, "Security_Groups")
-    SecPol = Menu("","Export Security Policies", None, SheetSecPol, "Security_Policies")
+    SecPol = Menu("","Export Security Policies and Manager Sections", None, SheetSecPol, "Security_Policies_Mgr_Sect")
     SecDFW = Menu("","Export Distributed Firewall", None, SheetSecDFW, "Rules_Distributed_Firewall")
+    SecMgrSect = Menu("","Export Security Rules per Mgr Sections", None, SheetSecRulesSec, "Security_Rules_Mgr_Section")
     SecPrev = Menu("","Return to previous menu", None, 'Back')
 
     MonAlarm = Menu("", "Export Alarms", None, SheetAlarms,"Alarms")
@@ -99,7 +102,7 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
 
     DocFab = Menu("\nNSX-T Fabric Documents", "NSX-T Fabric Options", [FabManager, FabNodes, FabTZ, FabServices, FabTunnles, FabPrev])
     DocVNS = Menu("\nVirtual Networking Documents", "Virtual Networking Options", [VNSSegment,VNSRouterSum,VNSRouterPort,VNST1Segment,VNST1RoutingSessions, VNST0,VNST1Tables,VNSPrev])
-    DocSecu = Menu("\nSecurity Documents", "Security Options" ,[SecGrp, SecPol, SecDFW, SecPrev])
+    DocSecu = Menu("\nSecurity Documents", "Security Options" ,[SecGrp, SecPol, SecDFW, SecMgrSect, SecPrev])
     DocMon = Menu("\nMonitoring & Alarm Documents", "Monitoring & Alarm Options" ,[MonAlarm, MonPrev])
     DocSet = Menu("\nNSX Document Set", "Create documentation set", [DocSetOneFile,DocSetMultiple,DocSetPrev])
     DocPrev = Menu("", "Return to main menu", None, 'Back')
@@ -117,7 +120,8 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
     subhealth11 = Menu("", "Display Security Usage", None, GetSecurityUsage)
     subhealth12 = Menu("", "Display Inventory Usage", None, GetInventoryUsage)
     subhealth13 = Menu("", "Display DFW Rules per VNIC", None, GetDFWRulesVNIC)
-    subhealth14 = Menu("", "Return to previous menu", None, 'Back')
+    subhealth14 = Menu("", "Display DFW Rules statistics", None, GetDFWRulesStats)
+    subhealth15 = Menu("", "Return to previous menu", None, 'Back')
 
     Doc = Menu("\nNSX-T Documentation", "NSX-T Documentation", [DocFab, DocVNS, DocSecu, DocMon, DocSet, DocPrev])
     Health = Menu("\nHealth Checks", "Health Checks", [subhealth1,subhealth2,subhealth3,subhealth4,subhealth5,subhealth6,subhealth7,subhealth8,subhealth9,subhealth10,subhealth11, subhealth12, subhealth13, subhealth14])
@@ -209,3 +213,4 @@ def MainMenu(authlist,dest,menu_path,menu_mode):
                 current_menu = current_menu.choices[inpt]
             except Exception as error:
                 print(style.RED + "==> Invalid input: " + str(error) + style.NORMAL)
+                traceback.print_exc()
