@@ -42,7 +42,7 @@ def SheetNSXServices(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
     services_json = GetAPI(SessionNSX[0],services_url, auth_list)
 
     XLS_Lines = []
-    TN_HEADER_ROW = ('Services Name', 'Services Entries', 'Service Type', 'Port # / Additionnal Properties', 'Tags', 'Scope')
+    TN_HEADER_ROW = ('Services Name', 'UUID', 'Services Entries', 'Service Type', 'Port # / Additionnal Properties', 'Tags', 'Scope', 'Path','Relative Path')
     if services_json['result_count'] > 0:
         for SR in services_json['results']:
             TAGS = ""
@@ -89,12 +89,17 @@ def SheetNSXServices(auth_list,WORKBOOK,TN_WS, NSX_Config = {}):
             Dict_Services['ports'] = List_Ports
             Dict_Services['protocols'] = List_Proto
             Dict_Services['services_entries'] = List_SR
+            if 'unique_id' in SR:
+                Dict_Services['uuid'] = SR['unique_id']
+                SRUUID = SR['unique_id']
+            else:
+                SRUUID = "buggy 3.1"
             NSX_Config['Services'].append(Dict_Services)
             # Create Line
-            XLS_Lines.append([SR['display_name'], "\n".join(List_SR), Proto, svc_ports, TAGS, SCOPE])
+            XLS_Lines.append([SR['display_name'], SRUUID, "\n".join(List_SR), Proto, svc_ports, TAGS, SCOPE, SR['path'], SR['relative_path']])
 
     else:
-        XLS_Lines.append(['No results', "", "", "", "", ""])
+        XLS_Lines.append(['No results', "", "", "", "", "", "", "", ""])
 
     if GetOutputFormat() == 'CSV':
         CSV = WORKBOOK
